@@ -102,7 +102,7 @@ ${chalk.grey('——————————————————')}`
       }
 
       if (remotes.length === 1) {
-        const isPushConfirmedByUser = await confirm({
+        const isPushConfirmedByUser = sayYesToConfirmation || await confirm({
           message: 'Do you want to run `git push`?'
         });
 
@@ -196,7 +196,7 @@ export async function commit(
 
   if (!stagedFiles.length) {
     stagedFilesSpinner.stop('No files are staged');
-    const isStageAllAndCommitConfirmedByUser = await confirm({
+    const isStageAllAndCommitConfirmedByUser = sayYesToConfirmation || await confirm({
       message: 'Do you want to stage all files and generate commit message?'
     });
 

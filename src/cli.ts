@@ -19,11 +19,10 @@ cli(
     commands: [configCommand, hookCommand, commitlintConfigCommand],
     flags: {
       fgm: Boolean,
-      yes: Boolean,
-      // y: {
-      //   type: Boolean,
-      //   alias: 'yes',
-      // }
+      yes: {
+        type: Boolean,
+        alias: 'y',
+      }
     },
     ignoreArgv: (type) => type === 'unknown-flag' || type === 'argument',
     help: { description: packageJSON.description }

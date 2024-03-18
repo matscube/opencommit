@@ -22462,7 +22462,7 @@ ${source_default.grey("\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2
         process.exit(0);
       }
       if (remotes.length === 1) {
-        const isPushConfirmedByUser = await Q3({
+        const isPushConfirmedByUser = sayYesToConfirmation || await Q3({
           message: "Do you want to run `git push`?"
         });
         if (isPushConfirmedByUser && !eD2(isPushConfirmedByUser)) {
@@ -22534,7 +22534,7 @@ async function commit(extraArgs2 = [], isStageAllFlag = false, fullGitMojiSpec =
   stagedFilesSpinner.start("Counting staged files");
   if (!stagedFiles.length) {
     stagedFilesSpinner.stop("No files are staged");
-    const isStageAllAndCommitConfirmedByUser = await Q3({
+    const isStageAllAndCommitConfirmedByUser = sayYesToConfirmation || await Q3({
       message: "Do you want to stage all files and generate commit message?"
     });
     if (isStageAllAndCommitConfirmedByUser && !eD2(isStageAllAndCommitConfirmedByUser)) {
@@ -22773,7 +22773,10 @@ Z2(
     commands: [configCommand, hookCommand, commitlintConfigCommand],
     flags: {
       fgm: Boolean,
-      yes: Boolean
+      yes: {
+        type: Boolean,
+        alias: "y"
+      }
     },
     ignoreArgv: (type) => type === "unknown-flag" || type === "argument",
     help: { description: package_default.description }
