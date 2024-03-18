@@ -22417,7 +22417,7 @@ var checkMessageTemplate = (extraArgs2) => {
   }
   return false;
 };
-var generateCommitMessageFromGitDiff = async (diff, extraArgs2, fullGitMojiSpec) => {
+var generateCommitMessageFromGitDiff = async (diff, extraArgs2, fullGitMojiSpec, sayYesToConfirmation = false) => {
   await assertGitRepo();
   const commitSpinner = le();
   commitSpinner.start("Generating the commit message");
@@ -22442,7 +22442,7 @@ ${source_default.grey("\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2
 ${commitMessage}
 ${source_default.grey("\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014")}`
     );
-    const isCommitConfirmedByUser = await Q3({
+    const isCommitConfirmedByUser = sayYesToConfirmation || await Q3({
       message: "Confirm the commit message?"
     });
     if (isCommitConfirmedByUser && !eD2(isCommitConfirmedByUser)) {
@@ -22509,7 +22509,7 @@ ${source_default.grey("\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2
     process.exit(1);
   }
 };
-async function commit(extraArgs2 = [], isStageAllFlag = false, fullGitMojiSpec = false) {
+async function commit(extraArgs2 = [], isStageAllFlag = false, fullGitMojiSpec = false, sayYesToConfirmation = false) {
   if (isStageAllFlag) {
     const changedFiles2 = await getChangedFiles();
     if (changedFiles2)
@@ -22538,7 +22538,7 @@ async function commit(extraArgs2 = [], isStageAllFlag = false, fullGitMojiSpec =
       message: "Do you want to stage all files and generate commit message?"
     });
     if (isStageAllAndCommitConfirmedByUser && !eD2(isStageAllAndCommitConfirmedByUser)) {
-      await commit(extraArgs2, true, fullGitMojiSpec);
+      await commit(extraArgs2, true, fullGitMojiSpec, sayYesToConfirmation);
       process.exit(1);
     }
     if (stagedFiles.length === 0 && changedFiles.length > 0) {
@@ -22553,7 +22553,7 @@ async function commit(extraArgs2 = [], isStageAllFlag = false, fullGitMojiSpec =
         process.exit(1);
       await gitAdd({ files });
     }
-    await commit(extraArgs2, false, fullGitMojiSpec);
+    await commit(extraArgs2, false, fullGitMojiSpec, sayYesToConfirmation);
     process.exit(1);
   }
   stagedFilesSpinner.stop(
@@ -22564,7 +22564,8 @@ ${stagedFiles.map((file) => `  ${file}`).join("\n")}`
     generateCommitMessageFromGitDiff(
       await getDiff({ files: stagedFiles }),
       extraArgs2,
-      fullGitMojiSpec
+      fullGitMojiSpec,
+      sayYesToConfirmation
     )
   );
   if (generateCommitError) {
@@ -22771,7 +22772,8 @@ Z2(
     name: "opencommit",
     commands: [configCommand, hookCommand, commitlintConfigCommand],
     flags: {
-      fgm: Boolean
+      fgm: Boolean,
+      yes: Boolean
     },
     ignoreArgv: (type) => type === "unknown-flag" || type === "argument",
     help: { description: package_default.description }
@@ -22781,7 +22783,7 @@ Z2(
     if (await isHookCalled()) {
       prepareCommitMessageHook();
     } else {
-      commit(extraArgs, false, flags.fgm);
+      commit(extraArgs, false, flags.fgm, flags.yes);
     }
   },
   extraArgs

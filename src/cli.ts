@@ -18,7 +18,12 @@ cli(
     name: 'opencommit',
     commands: [configCommand, hookCommand, commitlintConfigCommand],
     flags: {
-      fgm: Boolean
+      fgm: Boolean,
+      yes: Boolean,
+      // y: {
+      //   type: Boolean,
+      //   alias: 'yes',
+      // }
     },
     ignoreArgv: (type) => type === 'unknown-flag' || type === 'argument',
     help: { description: packageJSON.description }
@@ -29,7 +34,7 @@ cli(
     if (await isHookCalled()) {
       prepareCommitMessageHook();
     } else {
-      commit(extraArgs, false, flags.fgm);
+      commit(extraArgs, false, flags.fgm, flags.yes);
     }
   },
   extraArgs
