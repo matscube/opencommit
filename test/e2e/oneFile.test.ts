@@ -1,78 +1,84 @@
-// import { prepareEnvironment } from 'cli-testing-library';
+import { resolve } from 'path'
+import { render, configure } from 'cli-testing-library'
+import 'cli-testing-library/extend-expect';
+
+const rootPath = resolve(process.cwd());
+const testRootPath = resolve(rootPath, 'temp/test');
+const testGitPath = resolve(rootPath, 'temp/test/local');
+async function setup() {
+  return resetTestDir();
+}
+async function tearDown() {
+  return resetTestDir();
+}
+async function resetTestDir() {
+  return render('rm', ['-rf', testRootPath], { cwd: rootPath });
+}
 
 it('run basic cli flow to generate commit message for single staged file', async () => {
-  // const { execute, spawn, writeFile, cleanup, ls, path } = await prepareEnvironment();
+  await setup();
+  await render('mkdir', [testRootPath], { cwd: rootPath });
 
-  // console.log(path);
-  // console.log(await ls('./'));
-  // console.log(await ls('./'));
+  const gitInitRemote = await render('git', ['init', '--bare', 'remote.git'], { cwd: testRootPath });
+  expect(gitInitRemote.getByText('Initialized empty Git repository')).toBeInTheConsole();
 
-//   console.log('start');
+  const gitInitRepository = await render('git' ,['clone remote.git local'], { cwd: testRootPath });
+  expect(await gitInitRepository.findByError('done.')).toBeInTheConsole();
 
+  await render('echo' ,[`'console.log("Hellow World");' > index.ts`], { cwd: testGitPath });
+  await render('git' ,['add index.ts'], { cwd: testGitPath });
 
-  /**
-   * 1. gitのremote用のbare repositoryを作成
-   * 2. gitのlocal repositoryを作成
-   * 3. gitのlocal repositoryにremote repositoryを追加
-   */
-  // await execute('git' ,'init --bare remote.git');
-  // const git = await spawn('git' ,'clone remote.git local');
-  // git.debug();
-  // await git.waitForText('done.');
-  // console.log(await ls('./'));
-  // expect(await ls('./')).toMatchInlineSnapshot(`
-  //   [
-  //     "local",
-  //     "remote.git",
-  //   ]
-  // `);
-  // await execute('cd' ,'local');
-  // console.log(await ls('./'));
+  configure({ asyncUtilTimeout: 5000 });
+  const cli = await render('node', [resolve(rootPath, './out/cli.cjs')], { cwd: testGitPath });
 
-  // await writeFile('./index.ts', 'console.log("hello world")');
-  // await execute('git' ,'add .');
+  expect(await cli.queryByText('No files are staged')).not.toBeInTheConsole();
+  expect(await cli.queryByText('Do you want to stage all files and generate commit message?')).not.toBeInTheConsole();
 
-  // const { waitForText, pressKey, getExitCode, debug } = await spawn(
-  //   'node',
-  //   './out/cli.cjs'
-  // );
-  // debug();
-  // await waitForText('Confirm the commit message?');
-  // await pressKey('enter');
+  expect(await cli.findByText('Generating the commit message')).toBeInTheConsole();
+  expect(await cli.findByText('Confirm the commit message?')).toBeInTheConsole();
+  cli.userEvent.keyboard('[Enter]');
 
-  // await waitForText('Do you want to run `git push`?');
-  // await pressKey('enter');
+  expect(await cli.findByText('Do you want to run `git push`?')).toBeInTheConsole();
+  cli.userEvent.keyboard('[Enter]');
 
-  // await waitForText('Successfully pushed all commits');
-  // expect(getExitCode()).toBe(0);
+  expect(await cli.findByText('Successfully pushed all commits to origin')).toBeInTheConsole();
 
-  // await cleanup();
-}, 5000);
+  await tearDown();
+});
 
-// it('run basic cli flow to generate commit message for 1 changed file (not staged)', async () => {
-//   const { spawn, writeFile, cleanup } = await prepareEnvironment();
+it('run basic cli flow to generate commit message for 1 changed file (not staged)', async () => {
+  await setup();
+  await render('mkdir', [testRootPath], { cwd: rootPath });
 
-//   await writeFile('src/test-index.ts', 'console.log("hello world")');
+  const gitInitRemote = await render('git', ['init', '--bare', 'remote.git'], { cwd: testRootPath });
+  expect(gitInitRemote.getByText('Initialized empty Git repository')).toBeInTheConsole();
 
-//   const { waitForText, pressKey, getExitCode } = await spawn(
-//     'node',
-//     './out/cli.cjs --test'
-//   );
+  const gitInitRepository = await render('git' ,['clone remote.git local'], { cwd: testRootPath });
+  expect(await gitInitRepository.findByError('done.')).toBeInTheConsole();
 
-//   await waitForText('Do you want to stage all files and generate commit message?');
-//   await pressKey('enter');
+  await render('echo' ,[`'console.log("Hellow World");' > index.ts`], { cwd: testGitPath });
+  await render('git' ,['add index.ts'], { cwd: testGitPath });
+  await render('git' ,[`cm -m 'add new file'`], { cwd: testGitPath });
 
-//   await waitForText('Confirm the commit message?');
-//   await pressKey('enter');
+  await render('echo' ,[`'console.log("Good night World");' >> index.ts`], { cwd: testGitPath });
 
-//   await waitForText('Successfully committed');
+  configure({ asyncUtilTimeout: 5000 });
+  const cli = await render('node', [resolve(rootPath, './out/cli.cjs')], { cwd: testGitPath });
 
-//   await waitForText('Do you want to run `git push`?');
-//   await pressKey('enter');
+  expect(await cli.findByText('No files are staged')).toBeInTheConsole();
+  expect(await cli.findByText('Do you want to stage all files and generate commit message?')).toBeInTheConsole();
+  cli.userEvent.keyboard('[Enter]');
 
-//   await waitForText('Successfully pushed all commits');
+  expect(await cli.findByText('Generating the commit message')).toBeInTheConsole();
+  expect(await cli.findByText('Confirm the commit message?')).toBeInTheConsole();
+  cli.userEvent.keyboard('[Enter]');
 
-//   expect(getExitCode()).toBe(0);
+  expect(await cli.findByText('Successfully committed')).toBeInTheConsole();
 
-//   await cleanup();
-// }, 100000);
+  expect(await cli.findByText('Do you want to run `git push`?')).toBeInTheConsole();
+  cli.userEvent.keyboard('[Enter]');
+
+  expect(await cli.findByText('Successfully pushed all commits to origin')).toBeInTheConsole();
+
+  await tearDown();
+});
