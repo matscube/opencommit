@@ -107,7 +107,7 @@ ${chalk.grey('——————————————————')}`
 
       if (remotes.length === 1 && config?.OCO_GITPUSH !== true) {
         const isPushConfirmedByUser = await confirm({
-          message: 'Do you want to run `git push`?'
+          message: 'Do you want to run `git push`? hogehoge'
         });
 
         if (isPushConfirmedByUser && !isCancel(isPushConfirmedByUser)) {

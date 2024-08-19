@@ -43292,7 +43292,7 @@ ${source_default.grey("\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2
       }
       if (remotes.length === 1 && config11?.OCO_GITPUSH !== true) {
         const isPushConfirmedByUser = await Q3({
-          message: "Do you want to run `git push`?"
+          message: "Do you want to run `git push`? hogehoge"
         });
         if (isPushConfirmedByUser && !hD2(isPushConfirmedByUser)) {
           const pushSpinner = le();
