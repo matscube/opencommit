@@ -43318,8 +43318,10 @@ ${source_default.grey("\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2
         });
         if (!hD2(selectedRemote)) {
           const pushSpinner = le();
-          pushSpinner.start(`TEST | Running 'git push ${selectedRemote}'`);
-          const { stdout: stdout2 } = await execa("git", ["push", selectedRemote]);
+          pushSpinner.start(`Running 'git push ${selectedRemote}'`);
+          const { stdout: stdout2 } = await execa("git", ["push", selectedRemote], {
+            stdin: "inherit"
+          });
           pushSpinner.stop(
             `${source_default.green(
               "\u2714"

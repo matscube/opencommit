@@ -141,9 +141,11 @@ ${chalk.grey('——————————————————')}`
         if (!isCancel(selectedRemote)) {
           const pushSpinner = spinner();
 
-          pushSpinner.start(`TEST | Running 'git push ${selectedRemote}'`);
+          pushSpinner.start(`Running 'git push ${selectedRemote}'`);
 
-          const { stdout } = await execa('git', ['push', selectedRemote]);
+          const { stdout } = await execa('git', ['push', selectedRemote], {
+            stdin: 'inherit'
+          });
 
           pushSpinner.stop(
             `${chalk.green(
