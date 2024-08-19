@@ -43292,7 +43292,7 @@ ${source_default.grey("\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2
       }
       if (remotes.length === 1 && config11?.OCO_GITPUSH !== true) {
         const isPushConfirmedByUser = await Q3({
-          message: "Do you want to run `git push`? hogehoge"
+          message: "Do you want to run `git push`?"
         });
         if (isPushConfirmedByUser && !hD2(isPushConfirmedByUser)) {
           const pushSpinner = le();
@@ -43318,7 +43318,7 @@ ${source_default.grey("\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2
         });
         if (!hD2(selectedRemote)) {
           const pushSpinner = le();
-          pushSpinner.start(`Running 'git push ${selectedRemote}'`);
+          pushSpinner.start(`TEST | Running 'git push ${selectedRemote}'`);
           const { stdout: stdout2 } = await execa("git", ["push", selectedRemote]);
           pushSpinner.stop(
             `${source_default.green(

@@ -107,7 +107,7 @@ ${chalk.grey('——————————————————')}`
 
       if (remotes.length === 1 && config?.OCO_GITPUSH !== true) {
         const isPushConfirmedByUser = await confirm({
-          message: 'Do you want to run `git push`? hogehoge'
+          message: 'Do you want to run `git push`?'
         });
 
         if (isPushConfirmedByUser && !isCancel(isPushConfirmedByUser)) {
@@ -141,7 +141,7 @@ ${chalk.grey('——————————————————')}`
         if (!isCancel(selectedRemote)) {
           const pushSpinner = spinner();
 
-          pushSpinner.start(`Running 'git push ${selectedRemote}'`);
+          pushSpinner.start(`TEST | Running 'git push ${selectedRemote}'`);
 
           const { stdout } = await execa('git', ['push', selectedRemote]);
 
